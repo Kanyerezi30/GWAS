@@ -642,3 +642,37 @@ plink --bfile mydata --make-pheno p1.list * --assoc
      plink.P2.assoc
      plink.P3.assoc
 
+#Covariate files
+#Certain PLINK commands support the inclusion of one or more covariates. Note that for stratified analyses,\
+#namely using the CMH (--mh) options, the strata are specified using the --within option to define clusters, rather than --covar.
+#To load a covariate use the option:
+
+plink --file mydata --covar c.txt
+
+#The covariate file should be formatted in a similar manner to the phenotype file. If an individual is not present in the covariate file,\
+#or if the individual has a missing phenotype value (i.e. -9 by default) for the covariate, then that individual is set to\
+#missing (i.e. will be excluded from association analysis).
+#To select a particular subset of covariates, use one of the following commands, which either use numbers or names\
+#(i.e. if a header row exists in the file),
+
+plink --file mydata --covar c.txt --covar-number 2,4-6,8
+
+#or
+
+plink --file mydata --covar c.txt --covar-name AGE,BMI-SMOKE,ALC
+
+#Note that ranges can be used in both cases, with the - hyphen symbol, e.g. if the first row were
+
+     FID IID SITE AGE DOB BMI ETH SMOKE STATUS ALC 
+
+#then both the above commands would have the same effect, i.e. selecting AGE, BMI, ETH, SMOKE, ALC.
+#To output a new covariate file, possibly with categorical variables downcoded to binary dummy variables use\
+#the --write-covar option as described here
+
+#If the --gxe command is used, that selects only a single covariate, then use the command --mcovar, that works similarly to --mpheno\
+#to select which single covariate to use: with the --gxe command, the --covar-name and --covar-number options will not work.
+
+#Not all commands accept covariates, and PLINK will not always give you an error or warning.\
+#The basic association (--assoc, --mh, --model, --tdt, --dfam, and --qfam) do not accept covariates, neither do the basic haplotype\
+#association methods (--hap-assoc, --hap-tdt). Among the commands that do are --linear, --logistic, --chap and --proxy-glm.\
+#Also --gxe accepts a single covariate only (the others listed here accept multiple covariates).
