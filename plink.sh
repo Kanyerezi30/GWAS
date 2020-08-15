@@ -704,3 +704,36 @@ plink --file mydata --within f.txt
      ...
 
 #All individuals in the file should be assigned to a single cluster in the cluster file.
+
+#Set files
+#Certain analyses (e.g. set based tests) require sets of SNPs to be specified. This is performed by including the --set\
+#option on the command line, followed by a filename that defines the sets. The file mydata.set should be in the following format:
+
+SET_A 
+rs10101
+rs20234
+rs29993
+END
+
+GENE-B
+rs2344
+rs888833
+END
+
+#That is, each set must start with a set name (e.g. SET_A), which might be a gene name, for example.\
+#This name can not have any spaces in it. The name is followed by a list of SNPs in that set.\
+#The keyword END specifies the end of that particular set. Do not name any SNPs to have the name END!
+#Sets can be overlapping. Any SNPs specified in the set that do not appear in the actual data, or that have been excluded due to\
+#filters used, will be ignored.
+#The format is flexible in terms of whether each item appears on one line: the set file only needs to be whitespace delimited. For example,\
+#the file above could be specified as:
+
+SET_A    rs10101 rs20234 rs29993 END
+GENE-B   rs2344 rs888833 END
+
+#It is possible to automatically create a set-file, given a list of genomic co-ordinates, using the --make-set command, described here.
+#To extract a subset of sets from a set file, use the --subset command in addition to --set. For example,
+
+--set mydata.set --subset extract.txt
+
+#where extract.txt is a text file with the set names you wish to extract, e.g. SET_A or GENE-B in this example
