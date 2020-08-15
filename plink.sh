@@ -676,3 +676,31 @@ plink --file mydata --covar c.txt --covar-name AGE,BMI-SMOKE,ALC
 #The basic association (--assoc, --mh, --model, --tdt, --dfam, and --qfam) do not accept covariates, neither do the basic haplotype\
 #association methods (--hap-assoc, --hap-tdt). Among the commands that do are --linear, --logistic, --chap and --proxy-glm.\
 #Also --gxe accepts a single covariate only (the others listed here accept multiple covariates).
+
+#Cluster files
+#To load a cluster solution, or indeed any categorical grouping of the sample, use the --within option:
+
+plink --file mydata --within f.txt
+
+#If this option is used, then permutation procedures will permute within-cluster only, effectively controlling for any effect of cluster\
+#membership. Similarly, tests that perform stratified analyses, such as the Cochran-Mantel-Haenszel, this option is used to define the strata.
+#This file should have a similar structure to the alternate phenotype file. The clusters can be coded either numerically or as strings:
+
+     F1 I1  A
+     F2 I1  B
+     F3 I1  B
+     F4 I1  C1
+     F5 I1  A
+     F6 I1  C2
+     F7 I1  C2
+     ...
+
+#Here, individuals would be grouped in four groups:
+
+     Cluster A:  F1/I1  F5/I1
+     Cluster B:  F2/I1  F3/I1
+     Cluster C1: F4/I1  
+     Cluster C2: F6/I1  F7/I1
+     ...
+
+#All individuals in the file should be assigned to a single cluster in the cluster file.
