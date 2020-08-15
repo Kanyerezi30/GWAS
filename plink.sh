@@ -478,3 +478,40 @@ plink --lfile f1 --reference ref.txt --recode
      5 1 0 0 1 1 0 0
      6 1 0 0 1 1 0 0
 
+#Binary PED files
+#To save space and time, you can make a binary ped file (*.bed). This will store the pedigree/phenotype information in\
+#separate file (*.fam) and create an extended MAP file (*.bim)\
+#(which contains information about the allele names, which would otherwise be lost in the BED file). To create these files use the command:
+
+plink --file mydata --make-bed
+
+#which creates (by default)
+
+     plink.bed      ( binary file, genotype information )
+     plink.fam      ( first six columns of mydata.ped ) 
+     plink.bim      ( extended MAP file: two extra cols = allele names)
+
+#The .fam and .bim files are still plain text files: these can be viewed with a standard text editor.\
+#Do not try to view the .bed file however: it is a compressed file and you'll only see lots of strange characters on the screen...
+
+#Do not make any changes any of these three files; e.g. setting the position to a negative value will not work to exclude a SNP for\
+#binary files
+#You can specify a different output root file name (i.e. different to "plink") by using the --out option:
+
+plink --file mydata --out mydata --make-bed
+
+#which will create
+
+     mydata.bed
+     mydata.fam
+     mydata.bim
+
+#To subsequently load a binary file, just use --bfile instead of --file
+
+plink --bfile mydata
+
+#When creating a binary ped file, the MAF and missingness filters are set to include everybody and all SNPs. If you want to change these,\
+#use --maf, --geno, etc, to manually specify these options: for example,
+
+plink --file mydata --make-bed --maf 0.02 --geno 0.1
+
