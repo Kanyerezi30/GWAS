@@ -515,3 +515,130 @@ plink --bfile mydata
 
 plink --file mydata --make-bed --maf 0.02 --geno 0.1
 
+#Alternate phenotype files
+#To specify an alternate phenotype for analysis, i.e. other than the one in the *.ped file\
+#(or, if using a binary fileset, the *.fam file), use the --pheno option:
+
+plink --file mydata --pheno pheno.txt
+
+#where pheno.txt is a file that contains 3 columns (one row per individual):
+
+     Family ID
+     Individual ID
+     Phenotype
+
+#The original PED file must still contain a phenotype in column 6 (even if this is a dummy phenotype, e.g. all missing),\
+#unless the --no-pheno flag is given.
+#If an individual is in the original file but not listed in the alternate phenotype file, that person's phenotype will be set to\
+#missing. If a person is in the alternate phenotype file but not in the original file, that entry will be ignored. \
+#The order of the alternate phenotype file need not be the same as for the original file.\
+#If the phenotype file contains more than one phenotype, then use the --mpheno N option to specify the Nth phenotype is the\
+#one to be used:
+
+plink --file mydata --pheno pheno2.txt --mpheno 4
+
+#where pheno2.txt contains 5 different phenotypes (i.e. 7 columns in total), this command will use the 4th for analysis (phenotype D):
+
+     Family ID
+     Individual ID
+     Phenotype A
+     Phenotype B
+     Phenotype C
+     Phenotype D
+     Phenotype E
+
+#Alternatively, your alternate phenotype file can have a header row, in which case you can use variable names to specify which\
+#phenotype to use. If you have a header row, the first two variables must be labelled FID and IID.\
+#All subsequent variable names cannot have any whitespace in them. For example,
+
+     FID    IID      qt1   bmi    site  
+     F1     1110     2.3   22.22  2     
+     F2     2202     34.12 18.23  1     
+     ...
+
+#then
+
+plink --file mydata --pheno pheno2.txt --pheno-name bmi --assoc
+
+#will select the second phenotype labelled "bmi", for analysis
+#Finally, if there is more than one phenotype, then for basic association tests, it is possible to specify that all phenotypes be\
+#tested, sequentially, with the output sent to different files: e.g. if bigpheno.raw contains 10,000 phenotypes, then
+
+plink --bfile mydata --assoc --pheno bigpheno.raw --all-pheno
+
+#will loop over all of these, one at a time testing for association with SNP, generating a lot of output. You might want to use the\
+#--pfilter command in this case, to only report results with a p-value less than a certain value, e.g. --pfilter 1e-3.
+
+#Currently, all phenotypes must be numerically coded, including missing values, in the alternate phenotype file.\
+#The default missing value is -9, change this with --missing-phenotype, but it must be a numeric value still\
+#(in contrast to the main phenotype in the PED/FAM file).
+
+#Creating a new binary phenotype automatically
+#To automatically form a one-versus-others binary phenotype (note: binary meaning dichotomous here, rather than a BED/binary-PED file)\
+#from a categorical covariate/phenotype file, use the command
+
+plink --bfile mydata --make-pheno site.cov SITE3 --assoc
+
+#which assumes the file
+
+     site.cov
+
+#contains exactly three fields
+
+     Family ID
+     Individual ID
+     Code from which phenotype is created
+
+#For example, if it were
+
+     A1  1  SITE1
+     B1  1  SITE1
+     C1  1  SITE2
+     D1  1  SITE3
+     E1  1  SITE3
+     F1  1  SITE4
+     G2  1  SITE4
+
+#then the above command would make individuals D1 and E1 as cases and everybody else as controls. However, if individuals present in\
+#mydata were not specified in site.cov, then these people would be set to have a missing phenotype.
+#An alternate specification is to use the * symbol instead of a value, e.g.
+
+plink --bfile mydata --make-pheno p1.list * --assoc
+
+#which assumes the file
+
+     p1.list
+
+#contains exactly two fields
+
+     Family ID
+     Individual ID
+
+#In this case, anybody in the file p1.list would be made a case; all other individuals in mydata but not in p1.list would be set as a\
+#control.
+#"Loop association": automatically testing each group versus all others
+#You may have a categorical factor that groups individuals (e.g. which plate they were genotyped on, or which sample they come from)\
+#and want to test whether there are allele frequency differences between each group and all others. This can be accomplished with\
+#the --loop-assoc command, e.g.
+
+./plink --bfile mydata --loop-assoc plate.lst --assoc
+
+#The file plate.lst should be in the same format as a cluster file, although it is only allowed to have a single variable\
+#(i.e. 3 columns, FID, IID and the cluster variable). If this were
+
+   10001  1   P1
+   10002  1   P1
+   10003  1   P2
+   10004  1   P2
+   10005  1   P3   
+   10006  1   P3
+   ...
+
+#This command would test all P1 individuals against all others, then all P2 individuals against all others, etc.\
+#Any of the main single SNP association tests for diseases can be supplied instead of --assoc (e.g. --fisher, --test-missing,\
+#--logistic, etc). The output is written to different files for each group, e.g. in the format outputname.{label}.extension
+
+     plink.P1.assoc
+     plink.P2.assoc
+     plink.P3.assoc
+
