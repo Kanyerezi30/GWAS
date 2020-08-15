@@ -1,0 +1,5 @@
+PED and MAP files are plain text files; PED files contain genotype information (one person per row) and MAP files contain information on the\
+name and position of the markers in the PED file
+
+Go to https://zzz.bwh.harvard.edu/plink/data.shtml to get more about the ped and map files
+
